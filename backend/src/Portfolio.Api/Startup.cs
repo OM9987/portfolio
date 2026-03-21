@@ -1,7 +1,11 @@
-﻿namespace Portfolio.Api;
+using Portfolio.Api.Services;
+
+namespace Portfolio.Api;
 
 public class Startup
 {
+    private const string FrontendCorsPolicy = "FrontendCorsPolicy";
+
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
@@ -12,7 +16,29 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddScoped<IExperienceService, ExperienceService>();
         services.AddControllers();
+        services.AddCors(options =>
+        {
+            options.AddPolicy(FrontendCorsPolicy, builder =>
+            {
+                var origins = Configuration
+                    .GetValue<string>("AllowedOrigins")
+                    ?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    ?? Array.Empty<string>();
+
+                if (origins.Length == 0)
+                {
+                    // Safe local default for early development.
+                    origins = ["http://localhost:3000"];
+                }
+
+                builder
+                    .WithOrigins(origins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -26,6 +52,7 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
+        app.UseCors(FrontendCorsPolicy);
 
         app.UseAuthorization();
 

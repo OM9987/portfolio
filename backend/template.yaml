@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Portfolio backend API running on AWS Lambda (.NET 8) with API Gateway HTTP API.
+
+Parameters:
+  AllowedOrigins:
+    Type: String
+    Default: http://localhost:3000
+    Description: Semicolon-separated list of allowed CORS origins for the backend API.
+
+Resources:
+  PortfolioHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowOrigins:
+          - http://localhost:3000
+
+  AspNetCoreFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Portfolio.Api/
+      Handler: Portfolio.Api::Portfolio.Api.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnet8
+      MemorySize: 256
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          AllowedOrigins: !Ref AllowedOrigins
+      Events:
+        ProxyResource:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortfolioHttpApi
+            Path: /{proxy+}
+            Method: ANY
+        RootResource:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortfolioHttpApi
+            Path: /
+            Method: ANY
+
+Outputs:
+  ApiURL:
+    Description: Portfolio HTTP API endpoint URL
+    Value: !Sub https://${PortfolioHttpApi}.execute-api.${AWS::Region}.amazonaws.com/
