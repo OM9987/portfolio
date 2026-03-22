@@ -17,6 +17,9 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddScoped<IExperienceService, ExperienceService>();
+        services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<IBlogPostService, BlogPostService>();
+        services.AddScoped<ISkillService, SkillService>();
         services.AddControllers();
         services.AddCors(options =>
         {
