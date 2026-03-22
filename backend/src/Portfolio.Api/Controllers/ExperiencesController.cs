@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Portfolio.Api.Interfaces;
 using Portfolio.Api.Models;
-using Portfolio.Api.Services;
 
 namespace Portfolio.Api.Controllers;
 

@@ -1,4 +1,5 @@
 using Portfolio.Api.Models;
+using Portfolio.Api.Interfaces;
 
 namespace Portfolio.Api.Services;
 

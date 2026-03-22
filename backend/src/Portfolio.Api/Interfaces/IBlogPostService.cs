@@ -1,6 +1,6 @@
 using Portfolio.Api.Models;
 
-namespace Portfolio.Api.Services;
+namespace Portfolio.Api.Interfaces;
 
 public interface IBlogPostService
 {

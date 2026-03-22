@@ -7,4 +7,5 @@ public sealed class Project
     public required string Description { get; init; }
     public required string Image { get; init; }
     public required IReadOnlyList<string> Technologies { get; init; }
+    public required string Category { get; init; }
 }
