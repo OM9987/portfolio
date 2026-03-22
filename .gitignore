@@ -27,3 +27,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+backend/src/Portfolio.Api/.vs/Portfolio.Api/FileContentIndex
+backend/src/Portfolio.Api/.vs/Portfolio.Api/v18
