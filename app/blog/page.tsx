@@ -1,24 +1,40 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { BlogCard } from "@/components/blog-card"
+import { getBlogPosts, type BlogPost } from "@/services/api"
 
 export default function BlogPage() {
-  const posts = [
-    {
-      id: "deep-time-prediction",
-      title: "The Promise of Deep Learning for Time Series Forecasting",
-      excerpt: "Time series forecasting plays a crucial role in various domains like finance, healthcare, and climate science. Traditional statistical methods such as ARIMA and exponential smoothing have been widely used, but they often struggle with complex, non-linear patterns in data.",
-      date: "2023-02-03",
-      readingTime: "4 min read",
-      mediumUrl: "https://medium.com/@omsingh1149/the-promise-of-deep-learning-for-time-series-forecasting-ff9d02932c62"
-    },
-    {
-      id: "api-versioning-aspnet",
-      title: "API Versioning in ASP.NET Core with .NET 8: A Practical Guide",
-      excerpt: "It explores implementing API versioning in ASP.NET Core using .NET 8, focusing on URL path versioning. It covers the importance of API versioning, setting up a .NET 8 Web API, various versioning approaches, step-by-step implementation, and best practices for robust API versioning.",
-      date: "2025-04-16",
-      readingTime: "3 min read",
-      mediumUrl: "https://medium.com/@omsingh1149/api-versioning-in-asp-net-core-with-net-8-a-practical-guide-07a2704b445e"
-    },
-  ]
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true)
+  const [postsError, setPostsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadPosts = async () => {
+      setIsLoadingPosts(true)
+      setPostsError(null)
+
+      try {
+        const response = await getBlogPosts()
+        if (!isMounted) return
+        setPosts(response)
+      } catch (error) {
+        if (!isMounted) return
+        console.error("Failed to load blog posts:", error)
+        setPostsError("Unable to load blog posts from API right now.")
+      } finally {
+        if (isMounted) setIsLoadingPosts(false)
+      }
+    }
+
+    void loadPosts()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div className="space-y-8">
@@ -36,11 +52,19 @@ export default function BlogPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {posts.map((post) => (
-          <BlogCard key={post.id} {...post} />
-        ))}
-      </div>
+      {isLoadingPosts ? (
+        <p className="text-muted-foreground">Loading blog posts...</p>
+      ) : postsError ? (
+        <p className="text-red-400">{postsError}</p>
+      ) : posts.length === 0 ? (
+        <p className="text-muted-foreground">No blog posts available.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {posts.map((post) => (
+            <BlogCard key={post.id} {...post} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

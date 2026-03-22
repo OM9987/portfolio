@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import emailjs from '@emailjs/browser'
 import { Terminal } from "@/components/terminal"
 import { Github, Linkedin, Mail, FileText } from "lucide-react"
@@ -8,12 +8,17 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { getExperiences, getSkills, type Experience, type SkillGroup } from "@/services/api"
 
 export default function AboutPage() {
   const [introComplete, setIntroComplete] = useState(false)
   const [bioComplete, setBioComplete] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [experiences, setExperiences] = useState<Experience[]>([])
+  const [skills, setSkills] = useState<SkillGroup[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [dataError, setDataError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -47,53 +52,38 @@ export default function AboutPage() {
     }
   }
 
-  const experiences = [
-    {
-      title: "Associate Developer (.NET)",
-      company: "Sportz Interactive Pvt. Ltd",
-      period: "07/2024 - Present",
-      description:
-        "Grew from a Junior Middleware Developer to owning backend architecture for Gaming Application. Built event-driven pipelines using AWS Lambda and SQS for scalable, real-time leaderboard processing. Optimized system performance with Redis caching, async workflows, and RDS Proxy, ensuring stability under high load. Developed and maintained ASP.NET Core APIs, real-time scoring via EventBridge, and improved observability with New Relic across AWS infrastructure."
-    },
-    {
-      title: "Data Science Intern | Core AI Team Member ",
-      company: "SayHey - KMR & Friends Pvt. Ltd",
-      period: "08/2022 - 12/2022",
-      description:
-        "Led a Government of India-awarded startup, driving projects in Transformers, Generative AI, and interactive Chatbots (RNN, LSTM, Bert). Developed personalized recommendation systems for a Mental Health app, enhancing user experience.",
-    }
-  ]
+  useEffect(() => {
+    let isMounted = true
 
-  const skills = [
-    {
-      category: "Languages",
-      items: ["C#", "Python", "JavaScript"]
-    },
-    {
-      category: "Frontend",
-      items: ["React", "Next.js", "Blazor", "Tailwind CSS"]
-    },
-    {
-      category: "Backend",
-      items: ["ASP.NET Core", "Node.js", "Express", "Microservices", "Event-Driven Architecture"]
-    },
-    {
-      category: "Database",
-      items: ["PostgreSQL", "MySQL", "MongoDB", "Redis", "RDS Proxy"]
-    },
-    {
-      category: "Cloud & DevOps",
-      items: ["AWS (Lambda, SQS, EventBridge, S3, EC2)", "Docker", "CI/CD", "Nginx", "System Design"]
-    },
-    {
-      category: "Observability & Performance",
-      items: ["New Relic", "Performance Optimization", "Distributed Caching", "Async Processing"]
-    },
-    {
-      category: "AI/ML",
-      items: ["Generative AI", "Deep Learning", "TensorFlow", "NLP", "Computer Vision"]
+    const loadAboutData = async () => {
+      setIsLoadingData(true)
+      setDataError(null)
+
+      try {
+        const [experienceData, skillsData] = await Promise.all([
+          getExperiences(),
+          getSkills(),
+        ])
+
+        if (!isMounted) return
+
+        setExperiences(experienceData)
+        setSkills(skillsData)
+      } catch (error) {
+        if (!isMounted) return
+        console.error("Failed to load about data:", error)
+        setDataError("Unable to load profile data from API right now.")
+      } finally {
+        if (isMounted) setIsLoadingData(false)
+      }
     }
-  ]
+
+    void loadAboutData()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div className="space-y-16">
@@ -120,34 +110,42 @@ export default function AboutPage() {
         <>
           <section>
             <h2 className="text-2xl font-bold mb-6">Experience Timeline</h2>
-            <div className="space-y-6">
-              {experiences.map((exp, index) => (
-                <div key={index} className="terminal-window">
-                  <div className="terminal-header">
-                    <div className="terminal-button terminal-button-red"></div>
-                    <div className="terminal-button terminal-button-yellow"></div>
-                    <div className="terminal-button terminal-button-green"></div>
-                    <div className="terminal-title">{exp.company}.sh</div>
-                  </div>
-                  <div className="terminal-content">
-                    <p className="mb-1">
-                      <span className="text-primary">$</span> cat job_details.txt
-                    </p>
-                    <div className="mb-2">
-                      <p>
-                        <span className="text-primary">title:</span> {exp.title}
+            {isLoadingData ? (
+              <p className="text-muted-foreground">Loading experience timeline...</p>
+            ) : dataError ? (
+              <p className="text-red-400">{dataError}</p>
+            ) : experiences.length === 0 ? (
+              <p className="text-muted-foreground">No experience entries available.</p>
+            ) : (
+              <div className="space-y-6">
+                {experiences.map((exp) => (
+                  <div key={exp.id} className="terminal-window">
+                    <div className="terminal-header">
+                      <div className="terminal-button terminal-button-red"></div>
+                      <div className="terminal-button terminal-button-yellow"></div>
+                      <div className="terminal-button terminal-button-green"></div>
+                      <div className="terminal-title">{exp.company}.sh</div>
+                    </div>
+                    <div className="terminal-content">
+                      <p className="mb-1">
+                        <span className="text-primary">$</span> cat job_details.txt
                       </p>
-                      <p>
-                        <span className="text-primary">period:</span> {exp.period}
-                      </p>
-                      <p>
-                        <span className="text-primary">description:</span> {exp.description}
-                      </p>
+                      <div className="mb-2">
+                        <p>
+                          <span className="text-primary">title:</span> {exp.title}
+                        </p>
+                        <p>
+                          <span className="text-primary">period:</span> {exp.period}
+                        </p>
+                        <p>
+                          <span className="text-primary">description:</span> {exp.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section>
@@ -163,21 +161,29 @@ export default function AboutPage() {
                 <p className="mb-4">
                   <span className="text-primary">$</span> cat /proc/skills
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {skills.map((skillGroup, index) => (
-                    <div key={index} className="space-y-2">
-                      <h3 className="text-primary font-bold">{skillGroup.category}</h3>
-                      <ul className="space-y-1">
-                        {skillGroup.items.map((skill, skillIndex) => (
-                          <li key={skillIndex} className="flex items-center gap-2">
-                            <span className="text-primary">-</span>
-                            <span>{skill}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+                {isLoadingData ? (
+                  <p className="text-muted-foreground">Loading skills...</p>
+                ) : dataError ? (
+                  <p className="text-red-400">{dataError}</p>
+                ) : skills.length === 0 ? (
+                  <p className="text-muted-foreground">No skill groups available.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {skills.map((skillGroup) => (
+                      <div key={skillGroup.category} className="space-y-2">
+                        <h3 className="text-primary font-bold">{skillGroup.category}</h3>
+                        <ul className="space-y-1">
+                          {skillGroup.items.map((skill) => (
+                            <li key={skill} className="flex items-center gap-2">
+                              <span className="text-primary">-</span>
+                              <span>{skill}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </section>

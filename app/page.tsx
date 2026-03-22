@@ -1,51 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Terminal } from "@/components/terminal"
 import { ProjectCard } from "@/components/project-card"
 import { BlogCard } from "@/components/blog-card"
 import { ArrowRight } from "lucide-react"
+import { getFeaturedProjects, getLatestBlogPosts, getSkills, type BlogPost, type Project, type SkillGroup } from "@/services/api"
 
 export default function Home() {
   const [introComplete, setIntroComplete] = useState(false)
-  
-  const featuredProjects = [
-    {
-      id: "turning-leaves",
-      title: "Turning Leaves Webapp",
-      description: "Seamless book shopping made easy. Explore an extensive collection, enjoy a user-friendly interface, and make secure purchases.",
-      image: "/turning-leaves.png?height=400&width=600",
-      technologies: ["ReactJS", "ExpressJS", "WebSockets","NodeJS", "Mongoose"],
-    },
-    {
-      id: "mask-detection",
-      title: "Face Mask Detection",
-      description: "Championed 'MaskDetectron' AI Guardian, safeguarding humanity one face mask at a time.",
-      image: "/placeholder.svg?height=400&width=600",
-      technologies: ["Python", "Keras", "VGG16" ,"OpenCV"],
-    },
-    {
-      id: "ai-chatbot",
-      title: "AI Chatbot",
-      description: "Conversational AI assistant with natural language processing and machine learning capabilities.",
-      image: "/placeholder.svg?height=400&width=600",
-      technologies: ["Python", "NLP", "TensorFlow"],
-    },
-  ]
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
+  const [latestPosts, setLatestPosts] = useState<BlogPost[]>([])
+  const [skills, setSkills] = useState<SkillGroup[]>([])
+  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [dataError, setDataError] = useState<string | null>(null)
 
-  const latestPosts = [
-    {
-      id: "deep-time-prediction",
-      title: "The Promise of Deep Learning for Time Series Forecasting",
-      excerpt: "Time series forecasting plays a crucial role in various domains like finance, healthcare, and climate science. Traditional statistical methods such as ARIMA and exponential smoothing have been widely used, but they often struggle with complex, non-linear patterns in data.",
-      date: "2023-02-03",
-      readingTime: "4 min read",
-      mediumUrl: "https://medium.com/@omsingh1149/the-promise-of-deep-learning-for-time-series-forecasting-ff9d02932c62"
-    },
-  ]
+  useEffect(() => {
+    let isMounted = true
 
-  const skills = ["C#", "C/C++", "JavaScript", "Python", "PostgreSQL", ".NET", "AWS", "Next.js", "Node.js", "TensorFlow" ,"OpenCV"]
+    const loadHomeData = async () => {
+      setIsLoadingData(true)
+      setDataError(null)
+
+      try {
+        const [projects, posts, skillGroups] = await Promise.all([
+          getFeaturedProjects(),
+          getLatestBlogPosts(1),
+          getSkills(),
+        ])
+
+        if (!isMounted) return
+
+        setFeaturedProjects(projects)
+        setLatestPosts(posts)
+        setSkills(skillGroups)
+      } catch (error) {
+        if (!isMounted) return
+        console.error("Failed to load home data:", error)
+        setDataError("Unable to load data from API right now.")
+      } finally {
+        if (isMounted) setIsLoadingData(false)
+      }
+    }
+
+    void loadHomeData()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div className="space-y-16">
@@ -77,11 +81,19 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredProjects.map((project) => (
-            <ProjectCard key={project.id} {...project} />
-          ))}
-        </div>
+        {isLoadingData ? (
+          <p className="text-muted-foreground">Loading featured projects...</p>
+        ) : dataError ? (
+          <p className="text-red-400">{dataError}</p>
+        ) : featuredProjects.length === 0 ? (
+          <p className="text-muted-foreground">No projects available.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredProjects.map((project) => (
+              <ProjectCard key={project.id} {...project} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section>
@@ -94,14 +106,29 @@ export default function Home() {
             <div className="terminal-title">system_specs.sh</div>
           </div>
           <div className="terminal-content">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {skills.map((skill, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <span className="text-primary">$</span>
-                  <span className="text-white">{skill}</span>
-                </div>
-              ))}
-            </div>
+            {isLoadingData ? (
+              <p className="text-muted-foreground">Loading skills...</p>
+            ) : dataError ? (
+              <p className="text-red-400">{dataError}</p>
+            ) : skills.length === 0 ? (
+              <p className="text-muted-foreground">No skills available.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {skills.map((skillGroup) => (
+                  <div key={skillGroup.category} className="space-y-2">
+                    <h3 className="text-primary font-bold">{skillGroup.category}</h3>
+                    <ul className="space-y-1">
+                      {skillGroup.items.map((skill) => (
+                        <li key={skill} className="flex items-center gap-2">
+                          <span className="text-primary">-</span>
+                          <span>{skill}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -114,11 +141,19 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          {latestPosts.map((post) => (
-            <BlogCard key={post.id} {...post} />
-          ))}
-        </div>
+        {isLoadingData ? (
+          <p className="text-muted-foreground">Loading latest post...</p>
+        ) : dataError ? (
+          <p className="text-red-400">{dataError}</p>
+        ) : latestPosts.length === 0 ? (
+          <p className="text-muted-foreground">No blog posts available.</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6">
+            {latestPosts.map((post) => (
+              <BlogCard key={post.id} {...post} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )
