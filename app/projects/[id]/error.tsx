@@ -1,39 +1,26 @@
 "use client"
 
-import { useEffect } from "react"
 import Link from "next/link"
 
-export default function ProjectsServerError({
+export default function ProjectDetailsError({
   error,
   reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    console.error("projects-server error:", error)
-  }, [error])
-
-  const message =
-    error.message && error.message !== "An error occurred in the Server Components render."
-      ? error.message
-      : "Unable to load projects right now."
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="terminal-window">
         <div className="terminal-header">
           <div className="terminal-button terminal-button-red"></div>
           <div className="terminal-button terminal-button-yellow"></div>
           <div className="terminal-button terminal-button-green"></div>
-          <div className="terminal-title">projects.sh</div>
+          <div className="terminal-title">project_details.sh</div>
         </div>
         <div className="terminal-content">
-          <p className="mb-2">
-            <span className="text-primary">$</span>{" "}
-            <span className="text-red-400">Error while loading projects directory.</span>
-          </p>
-          <p className="text-sm text-muted-foreground">{message}</p>
+          <p className="text-red-400">Unable to load project details.</p>
+          <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
         </div>
       </div>
 
@@ -46,10 +33,10 @@ export default function ProjectsServerError({
           Try again
         </button>
         <Link
-          href="/projects-server"
+          href="/projects"
           className="px-4 py-2 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
         >
-          Reload page
+          Back to projects
         </Link>
       </div>
     </div>

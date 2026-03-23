@@ -1,47 +1,28 @@
-"use client"
-
-import { useEffect, useState } from "react"
+import Link from "next/link"
 import { ProjectCard } from "@/components/project-card"
-import { getFeaturedProjects, type Project } from "@/services/api"
+import { getFeaturedProjects } from "@/services/api"
 
-export default function ProjectsPage() {
-  const [activeFilter, setActiveFilter] = useState<string>("all")
-  const [projects, setProjects] = useState<Project[]>([])
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true)
-  const [projectsError, setProjectsError] = useState<string | null>(null)
+const categories = [
+  { id: "all", name: "All" },
+  { id: "ai", name: "AI Engineering" },
+  { id: "web", name: "Backend & Full-Stack" },
+] as const
 
-  useEffect(() => {
-    let isMounted = true
+type CategoryId = (typeof categories)[number]["id"]
 
-    const loadProjects = async () => {
-      setIsLoadingProjects(true)
-      setProjectsError(null)
+function isCategoryId(id: string): id is CategoryId {
+  return categories.some((category) => category.id === id)
+}
 
-      try {
-        const response = await getFeaturedProjects()
-        if (!isMounted) return
-        setProjects(response)
-      } catch (error) {
-        if (!isMounted) return
-        console.error("Failed to load projects:", error)
-        setProjectsError("Unable to load projects from API right now.")
-      } finally {
-        if (isMounted) setIsLoadingProjects(false)
-      }
-    }
-
-    void loadProjects()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
-  const categories = [
-    { id: "all", name: "All" },
-    { id: "ai", name: "AI Engineering" },
-    { id: "web", name: "Backend & Full-Stack" },
-  ]
+export default async function ProjectsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>
+}) {
+  const params = await searchParams
+  const rawCategory = params.category ?? "all"
+  const activeFilter: CategoryId = isCategoryId(rawCategory) ? rawCategory : "all"
+  const projects = await getFeaturedProjects()
 
   const filteredProjects =
     activeFilter === "all" ? projects : projects.filter((project) => project.category === activeFilter)
@@ -63,26 +44,28 @@ export default function ProjectsPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <button
+        {categories.map((category) => {
+          const href = category.id === "all" ? "/projects" : `/projects?category=${category.id}`
+          const isActive = activeFilter === category.id
+
+          return (
+            <Link
             key={category.id}
-            onClick={() => setActiveFilter(category.id)}
+            href={href}
+            scroll={false}
             className={`px-3 py-1 text-sm rounded-md transition-colors ${
-              activeFilter === category.id
+              isActive
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
             }`}
           >
             {category.name}
-          </button>
-        ))}
+            </Link>
+          )
+        })}
       </div>
 
-      {isLoadingProjects ? (
-        <p className="text-muted-foreground">Loading projects...</p>
-      ) : projectsError ? (
-        <p className="text-red-400">{projectsError}</p>
-      ) : filteredProjects.length === 0 ? (
+      {filteredProjects.length === 0 ? (
         <p className="text-muted-foreground">No projects available for this filter.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

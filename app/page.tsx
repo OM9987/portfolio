@@ -1,77 +1,20 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Terminal } from "@/components/terminal"
 import { ProjectCard } from "@/components/project-card"
 import { BlogCard } from "@/components/blog-card"
 import { ArrowRight } from "lucide-react"
-import { getFeaturedProjects, getLatestBlogPosts, getSkills, type BlogPost, type Project, type SkillGroup } from "@/services/api"
+import { HomeIntro } from "@/components/home/home-intro"
+import { getFeaturedProjects, getLatestBlogPosts, getSkills } from "@/services/api"
 
-export default function Home() {
-  const [introComplete, setIntroComplete] = useState(false)
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
-  const [latestPosts, setLatestPosts] = useState<BlogPost[]>([])
-  const [skills, setSkills] = useState<SkillGroup[]>([])
-  const [isLoadingData, setIsLoadingData] = useState(true)
-  const [dataError, setDataError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let isMounted = true
-
-    const loadHomeData = async () => {
-      setIsLoadingData(true)
-      setDataError(null)
-
-      try {
-        const [projects, posts, skillGroups] = await Promise.all([
-          getFeaturedProjects(),
-          getLatestBlogPosts(1),
-          getSkills(),
-        ])
-
-        if (!isMounted) return
-
-        setFeaturedProjects(projects)
-        setLatestPosts(posts)
-        setSkills(skillGroups)
-      } catch (error) {
-        if (!isMounted) return
-        console.error("Failed to load home data:", error)
-        setDataError("Unable to load data from API right now.")
-      } finally {
-        if (isMounted) setIsLoadingData(false)
-      }
-    }
-
-    void loadHomeData()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
+export default async function Home() {
+  const [featuredProjects, latestPosts, skills] = await Promise.all([
+    getFeaturedProjects(),
+    getLatestBlogPosts(1),
+    getSkills(),
+  ])
 
   return (
     <div className="space-y-16">
-      <section className="py-12">
-        <Terminal
-          text="Hello, World. I am Om Singh. Full-stack developer and AI enthusiast. Welcome to my digital realm."
-          typingSpeed={40}
-          className="max-w-3xl mx-auto"
-          onComplete={() => setIntroComplete(true)}
-        />
-
-        {introComplete && (
-          <div className="mt-8 flex justify-center">
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-md transition-colors border border-primary/30"
-            >
-              Learn more about me <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
-      </section>
+      <HomeIntro />
 
       <section>
         <div className="flex items-center justify-between mb-6">
@@ -81,11 +24,7 @@ export default function Home() {
           </Link>
         </div>
 
-        {isLoadingData ? (
-          <p className="text-muted-foreground">Loading featured projects...</p>
-        ) : dataError ? (
-          <p className="text-red-400">{dataError}</p>
-        ) : featuredProjects.length === 0 ? (
+        {featuredProjects.length === 0 ? (
           <p className="text-muted-foreground">No projects available.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -106,11 +45,7 @@ export default function Home() {
             <div className="terminal-title">system_specs.sh</div>
           </div>
           <div className="terminal-content">
-            {isLoadingData ? (
-              <p className="text-muted-foreground">Loading skills...</p>
-            ) : dataError ? (
-              <p className="text-red-400">{dataError}</p>
-            ) : skills.length === 0 ? (
+            {skills.length === 0 ? (
               <p className="text-muted-foreground">No skills available.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -141,11 +76,7 @@ export default function Home() {
           </Link>
         </div>
 
-        {isLoadingData ? (
-          <p className="text-muted-foreground">Loading latest post...</p>
-        ) : dataError ? (
-          <p className="text-red-400">{dataError}</p>
-        ) : latestPosts.length === 0 ? (
+        {latestPosts.length === 0 ? (
           <p className="text-muted-foreground">No blog posts available.</p>
         ) : (
           <div className="grid grid-cols-1 gap-6">

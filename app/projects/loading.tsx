@@ -1,4 +1,4 @@
-export default function ProjectsServerLoading() {
+export default function ProjectsLoading() {
   return (
     <div className="space-y-8">
       <div className="terminal-window">
@@ -10,7 +10,7 @@ export default function ProjectsServerLoading() {
         </div>
         <div className="terminal-content">
           <div className="mb-4 h-4 w-full max-w-md animate-pulse rounded bg-muted/40" aria-hidden />
-          <p className="text-sm text-muted-foreground">Loading projects directory…</p>
+          <p className="text-sm text-muted-foreground">Loading projects directory...</p>
         </div>
       </div>
 

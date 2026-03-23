@@ -13,9 +13,24 @@ interface TerminalProps {
 export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = true, onComplete }: TerminalProps) {
   const [displayedText, setDisplayedText] = useState("")
   const [isTyping, setIsTyping] = useState(true)
+  const [shouldReduceMotion, setShouldReduceMotion] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (typeof window === "undefined") return
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const isSmallViewport = window.matchMedia("(max-width: 640px)").matches
+    setShouldReduceMotion(prefersReducedMotion || isSmallViewport)
+  }, [])
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setDisplayedText(text)
+      setIsTyping(false)
+      onComplete?.()
+      return
+    }
+
     let currentIndex = 0
     let timer: NodeJS.Timeout
 
@@ -35,7 +50,7 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
     return () => {
       clearTimeout(timer)
     }
-  }, [text, typingSpeed, onComplete])
+  }, [text, typingSpeed, onComplete, shouldReduceMotion])
 
   return (
     <div className={`terminal-window ${className}`} ref={containerRef}>
