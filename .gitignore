@@ -9,6 +9,19 @@
 
 # production
 /build
+/backend/**/bin/
+/backend/**/obj/
+/backend/.aws-sam/
+
+# .NET / Visual Studio
+*.dll
+*.pdb
+*.exe
+*.user
+*.suo
+*.cache
+/.vs/
+**/.vs/
 
 # debug
 npm-debug.log*
@@ -25,3 +38,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+backend/src/Portfolio.Api/.vs/Portfolio.Api/FileContentIndex
+backend/src/Portfolio.Api/.vs/Portfolio.Api/v18
