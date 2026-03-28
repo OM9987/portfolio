@@ -14,7 +14,11 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
   const [displayedText, setDisplayedText] = useState("")
   const [isTyping, setIsTyping] = useState(true)
   const [shouldReduceMotion, setShouldReduceMotion] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const onCompleteRef = useRef(onComplete)
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -24,10 +28,13 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
   }, [])
 
   useEffect(() => {
+    setDisplayedText("")
+    setIsTyping(true)
+
     if (shouldReduceMotion) {
       setDisplayedText(text)
       setIsTyping(false)
-      onComplete?.()
+      onCompleteRef.current?.()
       return
     }
 
@@ -41,7 +48,7 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
         timer = setTimeout(typeNextCharacter, typingSpeed)
       } else {
         setIsTyping(false)
-        if (onComplete) onComplete()
+        onCompleteRef.current?.()
       }
     }
 
@@ -50,10 +57,10 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
     return () => {
       clearTimeout(timer)
     }
-  }, [text, typingSpeed, onComplete, shouldReduceMotion])
+  }, [text, typingSpeed, shouldReduceMotion])
 
   return (
-    <div className={`terminal-window ${className}`} ref={containerRef}>
+    <div className={`terminal-window ${className}`}>
       <div className="terminal-header">
         <div className="terminal-button terminal-button-red"></div>
         <div className="terminal-button terminal-button-yellow"></div>

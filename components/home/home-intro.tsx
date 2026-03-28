@@ -11,7 +11,7 @@ export function HomeIntro() {
   return (
     <section className="py-12">
       <Terminal
-        text="Hello, World. I am Om Singh. Full-stack developer and AI enthusiast. Welcome to my digital realm."
+        text="AI & Data Science graduate turned backend engineer, building scalable systems for real-world, production workloads."
         typingSpeed={40}
         className="max-w-3xl mx-auto"
         onComplete={() => setIntroComplete(true)}
