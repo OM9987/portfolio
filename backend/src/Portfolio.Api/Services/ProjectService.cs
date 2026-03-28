@@ -9,6 +9,15 @@ public sealed class ProjectService : IProjectService
     [
         new Project
         {
+            Id = "serverless-portfolio-platform",
+            Title = "Serverless Portfolio Platform (2026)",
+            Description = "Built a production-grade serverless full-stack app with Next.js (SSR) and .NET 8 Lambda using clean service architecture. Designed scalable APIs via API Gateway + Lambda, delivered globally with CloudFront CDN. Implemented AWS SAM (IaC) with logging, CORS, and cost-optimized configs; improved performance via SSR, caching, and revalidation.",
+            Image = "/placeholder.svg?height=400&width=600",
+            Technologies = ["Next.js 15", ".NET 8", "AWS Lambda", "API Gateway", "S3", "CloudFront", "AWS SAM"],
+            Category = "web"
+        },
+        new Project
+        {
             Id = "ai-sports-engine",
             Title = "AI-Powered Sports Game Engine",
             Description = "Built a generative AI engine that creates complete sports web games from text prompts using GPT-4. Features real-time orchestration via WebSockets and dynamic theming with a full-stack architecture.",
