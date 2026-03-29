@@ -69,6 +69,15 @@
           }
         }
       }
+    },
+    "AspNetCoreFunctionLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${AspNetCoreFunction}"
+        },
+        "RetentionInDays": 7
+      }
     }
   },
   "Outputs": {
