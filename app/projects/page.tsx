@@ -1,6 +1,8 @@
-import Link from "next/link"
+"use client"
+
+import { useEffect, useState } from "react"
 import { ProjectCard } from "@/components/project-card"
-import { getFeaturedProjects } from "@/services/api"
+import { getFeaturedProjects, type Project } from "@/services/api"
 
 const categories = [
   { id: "all", name: "All" },
@@ -9,20 +11,36 @@ const categories = [
 ] as const
 
 type CategoryId = (typeof categories)[number]["id"]
+export default function ProjectsPage() {
+  const [activeFilter, setActiveFilter] = useState<CategoryId>("all")
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true)
+  const [projectsError, setProjectsError] = useState<string | null>(null)
 
-function isCategoryId(id: string): id is CategoryId {
-  return categories.some((category) => category.id === id)
-}
+  useEffect(() => {
+    let isMounted = true
+    const loadProjects = async () => {
+      setIsLoadingProjects(true)
+      setProjectsError(null)
+      try {
+        const response = await getFeaturedProjects()
+        if (!isMounted) return
+        setProjects(response)
+      } catch (error) {
+        if (!isMounted) return
+        console.error("Failed to load projects:", error)
+        setProjectsError("Unable to load projects from API right now.")
+      } finally {
+        if (isMounted) setIsLoadingProjects(false)
+      }
+    }
 
-export default async function ProjectsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ category?: string }>
-}) {
-  const params = await searchParams
-  const rawCategory = params.category ?? "all"
-  const activeFilter: CategoryId = isCategoryId(rawCategory) ? rawCategory : "all"
-  const projects = await getFeaturedProjects()
+    void loadProjects()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const filteredProjects =
     activeFilter === "all" ? projects : projects.filter((project) => project.category === activeFilter)
@@ -44,28 +62,26 @@ export default async function ProjectsPage({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {categories.map((category) => {
-          const href = category.id === "all" ? "/projects" : `/projects?category=${category.id}`
-          const isActive = activeFilter === category.id
-
-          return (
-            <Link
+        {categories.map((category) => (
+          <button
             key={category.id}
-            href={href}
-            scroll={false}
+            onClick={() => setActiveFilter(category.id)}
             className={`px-3 py-1 text-sm rounded-md transition-colors ${
-              isActive
+              activeFilter === category.id
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
             }`}
           >
             {category.name}
-            </Link>
-          )
-        })}
+          </button>
+        ))}
       </div>
 
-      {filteredProjects.length === 0 ? (
+      {isLoadingProjects ? (
+        <p className="text-muted-foreground">Loading projects...</p>
+      ) : projectsError ? (
+        <p className="text-red-400">{projectsError}</p>
+      ) : filteredProjects.length === 0 ? (
         <p className="text-muted-foreground">No projects available for this filter.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

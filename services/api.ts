@@ -32,7 +32,6 @@ export interface SkillGroup {
 const inflightRequests = new Map<string, Promise<unknown>>()
 const responseCache = new Map<string, { expiresAt: number; data: unknown }>()
 const RESPONSE_CACHE_TTL_MS = 3000
-const SERVER_REVALIDATE_SECONDS = 120
 
 function getApiBaseUrl(): string {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "")
@@ -47,7 +46,7 @@ async function getJson<T>(path: string): Promise<T> {
     const response = await fetch(`${getApiBaseUrl()}${path}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
-      next: { revalidate: SERVER_REVALIDATE_SECONDS },
+      cache: "force-cache",
     })
 
     if (!response.ok) {

@@ -4,6 +4,13 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { getFeaturedProjects } from "@/services/api"
 
+export const dynamicParams = false
+
+export async function generateStaticParams() {
+  const projects = await getFeaturedProjects()
+  return projects.map((project) => ({ id: project.id }))
+}
+
 export default async function ProjectPage({
   params,
 }: {
