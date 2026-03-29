@@ -1,55 +1,46 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ProjectCard } from "@/components/project-card"
+import { getFeaturedProjects, type Project } from "@/services/api"
 
+const categories = [
+  { id: "all", name: "All" },
+  { id: "ai", name: "AI Engineering" },
+  { id: "web", name: "Backend & Full-Stack" },
+] as const
+
+type CategoryId = (typeof categories)[number]["id"]
 export default function ProjectsPage() {
-  const [activeFilter, setActiveFilter] = useState<string>("all")
+  const [activeFilter, setActiveFilter] = useState<CategoryId>("all")
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true)
+  const [projectsError, setProjectsError] = useState<string | null>(null)
 
-  const projects = [
-      {
-        id: "ai-sports-engine",
-        title: "AI-Powered Sports Game Engine",
-        description:
-          "Built a generative AI engine that creates complete sports web games from text prompts using GPT-4. Features real-time orchestration via WebSockets and dynamic theming with a full-stack architecture.",
-        image: "/placeholder.svg?height=400&width=600",
-        technologies: ["Python", "ReactJS", "NodeJS", "Flask", "MongoDB", "OpenAI", "WebSockets"],
-        category: "ai",
-      },
-      {
-        id: "sales-copilot",
-        title: "AI Sales Co-Pilot",
-        description:
-          "Developed a multi-agent AI system to auto-generate client-ready sales presentations from briefs. Integrated Google Slides API for end-to-end deck creation with high content relevance.",
-        image: "/placeholder.svg?height=400&width=600",
-        technologies: ["FastAPI", "OpenAI", "ChromaDB", "SQLite", "Google Slides API"],
-        category: "ai",
-      },
-      {
-        id: "turning-leaves",
-        title: "Turning Leaves Webapp",
-        description:
-          "Location-based book marketplace enabling seamless discovery, negotiation, and transactions with a real-time, user-friendly interface.",
-        image: "/turning-leaves.png?height=400&width=600",
-        technologies: ["ReactJS", "NodeJS", "ExpressJS", "MongoDB", "WebSockets"],
-        category: "web",
-      },
-      {
-        id: "ipl-stats",
-        title: "IPL Stats Analytics Platform",
-        description:
-          "Full-stack analytics platform delivering deep IPL insights with interactive filtering, high-performance APIs, and optimized data querying.",
-        image: "/placeholder.svg?height=400&width=600",
-        technologies: [".NET Core", "ReactJS", "PostgreSQL", "Bootstrap"],
-        category: "web",
+  useEffect(() => {
+    let isMounted = true
+    const loadProjects = async () => {
+      setIsLoadingProjects(true)
+      setProjectsError(null)
+      try {
+        const response = await getFeaturedProjects()
+        if (!isMounted) return
+        setProjects(response)
+      } catch (error) {
+        if (!isMounted) return
+        console.error("Failed to load projects:", error)
+        setProjectsError("Unable to load projects from API right now.")
+      } finally {
+        if (isMounted) setIsLoadingProjects(false)
       }
-  ]
+    }
 
-  const categories = [
-    { id: "all", name: "All" },
-    { id: "ai", name: "AI Engineering" },
-    { id: "web", name: "Backend & Full-Stack" },
-  ]
+    void loadProjects()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const filteredProjects =
     activeFilter === "all" ? projects : projects.filter((project) => project.category === activeFilter)
@@ -86,18 +77,26 @@ export default function ProjectsPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProjects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            id={project.id}
-            title={project.title}
-            description={project.description}
-            image={project.image}
-            technologies={project.technologies}
-          />
-        ))}
-      </div>
+      {isLoadingProjects ? (
+        <p className="text-muted-foreground">Loading projects...</p>
+      ) : projectsError ? (
+        <p className="text-red-400">{projectsError}</p>
+      ) : filteredProjects.length === 0 ? (
+        <p className="text-muted-foreground">No projects available for this filter.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              id={project.id}
+              title={project.title}
+              description={project.description}
+              image={project.image}
+              technologies={project.technologies}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

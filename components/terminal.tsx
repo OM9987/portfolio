@@ -13,9 +13,31 @@ interface TerminalProps {
 export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = true, onComplete }: TerminalProps) {
   const [displayedText, setDisplayedText] = useState("")
   const [isTyping, setIsTyping] = useState(true)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [shouldReduceMotion, setShouldReduceMotion] = useState(false)
+  const onCompleteRef = useRef(onComplete)
 
   useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const isSmallViewport = window.matchMedia("(max-width: 640px)").matches
+    setShouldReduceMotion(prefersReducedMotion || isSmallViewport)
+  }, [])
+
+  useEffect(() => {
+    setDisplayedText("")
+    setIsTyping(true)
+
+    if (shouldReduceMotion) {
+      setDisplayedText(text)
+      setIsTyping(false)
+      onCompleteRef.current?.()
+      return
+    }
+
     let currentIndex = 0
     let timer: NodeJS.Timeout
 
@@ -26,7 +48,7 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
         timer = setTimeout(typeNextCharacter, typingSpeed)
       } else {
         setIsTyping(false)
-        if (onComplete) onComplete()
+        onCompleteRef.current?.()
       }
     }
 
@@ -35,10 +57,10 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
     return () => {
       clearTimeout(timer)
     }
-  }, [text, typingSpeed, onComplete])
+  }, [text, typingSpeed, shouldReduceMotion])
 
   return (
-    <div className={`terminal-window ${className}`} ref={containerRef}>
+    <div className={`terminal-window ${className}`}>
       <div className="terminal-header">
         <div className="terminal-button terminal-button-red"></div>
         <div className="terminal-button terminal-button-yellow"></div>

@@ -1,0 +1,15 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "portfolio-api-dev"
+resolve_s3 = true
+s3_prefix = "portfolio-api-dev"
+region = "ap-south-1"
+profile = "om-aws"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "AllowedOrigins=\"http://localhost:3000;https://d2sw9cbwktoc0b.cloudfront.net\""
+image_repositories = []
+
+[default.global.parameters]
+region = "ap-south-1"
