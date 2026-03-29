@@ -153,6 +153,14 @@
   border: 1px solid rgba(0, 255, 140, 0.6);
 }
 
+@media (hover: none) {
+  .card-hover:hover {
+    transform: none;
+    box-shadow: none;
+    border: 1px solid rgba(0, 255, 140, 0.2);
+  }
+}
+
 .terminal-window {
   border: 1px solid rgba(0, 255, 140, 0.5);
   background-color: rgba(0, 0, 0, 0.8);

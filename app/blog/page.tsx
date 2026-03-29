@@ -1,40 +1,8 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import { BlogCard } from "@/components/blog-card"
-import { getBlogPosts, type BlogPost } from "@/services/api"
+import { getBlogPosts } from "@/services/api"
 
-export default function BlogPage() {
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [isLoadingPosts, setIsLoadingPosts] = useState(true)
-  const [postsError, setPostsError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let isMounted = true
-
-    const loadPosts = async () => {
-      setIsLoadingPosts(true)
-      setPostsError(null)
-
-      try {
-        const response = await getBlogPosts()
-        if (!isMounted) return
-        setPosts(response)
-      } catch (error) {
-        if (!isMounted) return
-        console.error("Failed to load blog posts:", error)
-        setPostsError("Unable to load blog posts from API right now.")
-      } finally {
-        if (isMounted) setIsLoadingPosts(false)
-      }
-    }
-
-    void loadPosts()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
+export default async function BlogPage() {
+  const posts = await getBlogPosts()
 
   return (
     <div className="space-y-8">
@@ -52,11 +20,7 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {isLoadingPosts ? (
-        <p className="text-muted-foreground">Loading blog posts...</p>
-      ) : postsError ? (
-        <p className="text-red-400">{postsError}</p>
-      ) : posts.length === 0 ? (
+      {posts.length === 0 ? (
         <p className="text-muted-foreground">No blog posts available.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

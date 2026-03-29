@@ -42,6 +42,20 @@ function getApiBaseUrl(): string {
 }
 
 async function getJson<T>(path: string): Promise<T> {
+  if (typeof window === "undefined") {
+    const response = await fetch(`${getApiBaseUrl()}${path}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "force-cache",
+    })
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`)
+    }
+
+    return (await response.json()) as T
+  }
+
   const requestKey = path
   const now = Date.now()
   const cachedResponse = responseCache.get(requestKey)

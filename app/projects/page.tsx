@@ -4,19 +4,24 @@ import { useEffect, useState } from "react"
 import { ProjectCard } from "@/components/project-card"
 import { getFeaturedProjects, type Project } from "@/services/api"
 
+const categories = [
+  { id: "all", name: "All" },
+  { id: "ai", name: "AI Engineering" },
+  { id: "web", name: "Backend & Full-Stack" },
+] as const
+
+type CategoryId = (typeof categories)[number]["id"]
 export default function ProjectsPage() {
-  const [activeFilter, setActiveFilter] = useState<string>("all")
+  const [activeFilter, setActiveFilter] = useState<CategoryId>("all")
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoadingProjects, setIsLoadingProjects] = useState(true)
   const [projectsError, setProjectsError] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
-
     const loadProjects = async () => {
       setIsLoadingProjects(true)
       setProjectsError(null)
-
       try {
         const response = await getFeaturedProjects()
         if (!isMounted) return
@@ -36,12 +41,6 @@ export default function ProjectsPage() {
       isMounted = false
     }
   }, [])
-
-  const categories = [
-    { id: "all", name: "All" },
-    { id: "ai", name: "AI Engineering" },
-    { id: "web", name: "Backend & Full-Stack" },
-  ]
 
   const filteredProjects =
     activeFilter === "all" ? projects : projects.filter((project) => project.category === activeFilter)

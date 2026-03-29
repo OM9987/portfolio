@@ -12,15 +12,7 @@ Resources:
   PortfolioHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      CorsConfiguration:
-        AllowMethods:
-          - GET
-          - OPTIONS
-        AllowHeaders:
-          - Content-Type
-          - Authorization
-        AllowOrigins:
-          - http://localhost:3000
+      CorsConfiguration: false
 
   AspNetCoreFunction:
     Type: AWS::Serverless::Function
