@@ -41,12 +41,6 @@ Resources:
             Path: /
             Method: ANY
 
-  AspNetCoreFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AspNetCoreFunction}
-      RetentionInDays: 7
-
 Outputs:
   ApiURL:
     Description: Portfolio HTTP API endpoint URL
