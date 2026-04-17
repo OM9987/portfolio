@@ -12,7 +12,7 @@ public sealed class ProjectService : IProjectService
             Id = "serverless-portfolio-platform",
             Title = "Serverless Portfolio Platform (2026)",
             Description = "Built a production-grade serverless full-stack app with Next.js (SSR) and .NET 8 Lambda using clean service architecture. Designed scalable APIs via API Gateway + Lambda, delivered globally with CloudFront CDN. Implemented AWS SAM (IaC) with logging, CORS, and cost-optimized configs; improved performance via SSR, caching, and revalidation.",
-            Image = "/placeholder.svg?height=400&width=600",
+            Image = "/Tenshi-Terminal.png?height=400&width=600",
             Technologies = ["Next.js 15", ".NET 8", "AWS Lambda", "API Gateway", "S3", "CloudFront", "AWS SAM"],
             Category = "web"
         },
@@ -21,7 +21,7 @@ public sealed class ProjectService : IProjectService
             Id = "ai-sports-engine",
             Title = "AI-Powered Sports Game Engine",
             Description = "Built a generative AI engine that creates complete sports web games from text prompts using GPT-4. Features real-time orchestration via WebSockets and dynamic theming with a full-stack architecture.",
-            Image = "/placeholder.svg?height=400&width=600",
+            Image = "/engine-dashboard.png?height=400&width=600",
             Technologies = ["Python", "ReactJS", "NodeJS", "Flask", "MongoDB", "OpenAI", "WebSockets"],
             Category = "ai"
         },
@@ -30,7 +30,7 @@ public sealed class ProjectService : IProjectService
             Id = "sales-copilot",
             Title = "AI Sales Co-Pilot",
             Description = "Developed a multi-agent AI system to auto-generate client-ready sales presentations from briefs. Integrated Google Slides API for end-to-end deck creation with high content relevance.",
-            Image = "/placeholder.svg?height=400&width=600",
+            Image = "/Sales_Co-Pilot.png?height=400&width=600",
             Technologies = ["FastAPI", "OpenAI", "ChromaDB", "SQLite", "Google Slides API"],
             Category = "ai"
         },

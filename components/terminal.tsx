@@ -61,14 +61,16 @@ export function Terminal({ text, typingSpeed = 50, className = "", showPrompt = 
 
   return (
     <div className={`terminal-window ${className}`}>
-      <div className="terminal-header">
-        <div className="terminal-button terminal-button-red"></div>
-        <div className="terminal-button terminal-button-yellow"></div>
-        <div className="terminal-button terminal-button-green"></div>
-        <div className="terminal-title">terminal</div>
+      <div className="terminal-header relative justify-center pt-2">
+        <div className="absolute left-4 flex gap-2 items-center">
+          <div className="terminal-button terminal-button-red"></div>
+          <div className="terminal-button terminal-button-yellow"></div>
+          <div className="terminal-button terminal-button-green"></div>
+        </div>
+        <div className="terminal-title m-0 text-center font-sans tracking-wide">terminal</div>
       </div>
-      <div className="terminal-content">
-        {showPrompt && <span className="text-primary">$ </span>}
+      <div className="terminal-content pt-2">
+        {showPrompt && <span className="text-neon font-bold">$ </span>}
         <span>{displayedText}</span>
         {isTyping && <span className="terminal-cursor"></span>}
       </div>

@@ -17,9 +17,9 @@ export async function HomeDataSections() {
       <>
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Featured Projects</h2>
-            <Link href="/projects" className="text-primary hover:underline inline-flex items-center gap-1">
-              View all <ArrowRight size={16} />
+            <h2 className="text-2xl font-bold font-sans">Featured Projects</h2>
+            <Link href="/projects/" className="font-mono text-neon hover:text-white transition-colors inline-flex items-center gap-1 group">
+              View all <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
           {homeProjects.length === 0 ? (
@@ -34,13 +34,15 @@ export async function HomeDataSections() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-6">Skills</h2>
+          <h2 className="text-2xl font-bold mb-6 font-sans">Skills</h2>
           <div className="terminal-window">
-            <div className="terminal-header">
-              <div className="terminal-button terminal-button-red"></div>
-              <div className="terminal-button terminal-button-yellow"></div>
-              <div className="terminal-button terminal-button-green"></div>
-              <div className="terminal-title">system_specs.sh</div>
+            <div className="terminal-header relative justify-center pt-2">
+              <div className="absolute left-4 flex gap-2 items-center">
+                <div className="terminal-button terminal-button-red"></div>
+                <div className="terminal-button terminal-button-yellow"></div>
+                <div className="terminal-button terminal-button-green"></div>
+              </div>
+              <div className="terminal-title m-0 text-center font-sans tracking-wide">system_specs.sh</div>
             </div>
             <div className="terminal-content">
               {skills.length === 0 ? (
@@ -90,11 +92,13 @@ export async function HomeDataSections() {
     return (
       <section>
         <div className="terminal-window">
-          <div className="terminal-header">
-            <div className="terminal-button terminal-button-red"></div>
-            <div className="terminal-button terminal-button-yellow"></div>
-            <div className="terminal-button terminal-button-green"></div>
-            <div className="terminal-title">home_data.sh</div>
+          <div className="terminal-header relative justify-center pt-2">
+            <div className="absolute left-4 flex gap-2 items-center">
+              <div className="terminal-button terminal-button-red"></div>
+              <div className="terminal-button terminal-button-yellow"></div>
+              <div className="terminal-button terminal-button-green"></div>
+            </div>
+            <div className="terminal-title m-0 text-center font-sans tracking-wide">home_data.sh</div>
           </div>
           <div className="terminal-content">
             <p className="text-red-400">Unable to load home data right now.</p>

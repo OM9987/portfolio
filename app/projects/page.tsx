@@ -48,15 +48,17 @@ export default function ProjectsPage() {
   return (
     <div className="space-y-8">
       <div className="terminal-window">
-        <div className="terminal-header">
-          <div className="terminal-button terminal-button-red"></div>
-          <div className="terminal-button terminal-button-yellow"></div>
-          <div className="terminal-button terminal-button-green"></div>
-          <div className="terminal-title">projects.sh</div>
+        <div className="terminal-header relative justify-center pt-2">
+          <div className="absolute left-4 flex gap-2 items-center">
+            <div className="terminal-button terminal-button-red"></div>
+            <div className="terminal-button terminal-button-yellow"></div>
+            <div className="terminal-button terminal-button-green"></div>
+          </div>
+          <div className="terminal-title m-0 text-center font-sans tracking-wide">projects.sh</div>
         </div>
         <div className="terminal-content">
           <p className="mb-4">
-            <span className="text-primary">$</span> Displaying projects directory. Select category to filter results.
+            <span className="text-neon font-bold">$</span> Displaying projects directory. Select category to filter results.
           </p>
         </div>
       </div>
@@ -66,10 +68,10 @@ export default function ProjectsPage() {
           <button
             key={category.id}
             onClick={() => setActiveFilter(category.id)}
-            className={`px-3 py-1 text-sm rounded-md transition-colors ${
+            className={`px-4 py-1.5 text-sm font-sans rounded-full transition-all duration-300 font-medium ${
               activeFilter === category.id
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                ? "bg-neon text-black shadow-[0_0_10px_rgba(0,255,140,0.5)]"
+                : "glass-panel hover:text-neon hover:border-neon/40 text-gray-300"
             }`}
           >
             {category.name}
@@ -78,7 +80,22 @@ export default function ProjectsPage() {
       </div>
 
       {isLoadingProjects ? (
-        <p className="text-muted-foreground">Loading projects...</p>
+        <div className="flex flex-col items-center justify-center py-16 gap-6 glass-panel rounded-xl">
+          <div className="relative h-12 w-12 animate-spin">
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div
+                key={i}
+                className="absolute left-1/2 top-0 h-3.5 w-1 -translate-x-1/2 rounded-full bg-neon"
+                style={{
+                  transform: `rotate(${i * 45}deg) translateY(0)`,
+                  transformOrigin: "center 24px",
+                  opacity: 1 - i * 0.1,
+                }}
+              />
+            ))}
+          </div>
+          <p className="text-sm text-neon font-mono animate-pulse tracking-widest uppercase">Fetching Projects Info...</p>
+        </div>
       ) : projectsError ? (
         <p className="text-red-400">{projectsError}</p>
       ) : filteredProjects.length === 0 ? (

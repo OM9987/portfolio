@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} CODE_NEXUS. All rights reserved.
+              &copy; {new Date().getFullYear()} Tenshi Terminal. All rights reserved.
             </p>
           </div>
           <div className="flex space-x-4">
@@ -17,10 +17,10 @@ export function Footer() {
               <span className="sr-only">GitHub</span>
             </Link>
             <Link href="https://medium.com/@omsingh1149" className="text-muted-foreground hover:text-primary transition-colors">
-            <FileText size={20} />
+              <FileText size={20} />
               <span className="sr-only">Medium</span>
             </Link>
-            <Link href="https://linkedin.com" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href="https://www.linkedin.com/in/om-singh6363/" className="text-muted-foreground hover:text-primary transition-colors">
               <Linkedin size={20} />
               <span className="sr-only">LinkedIn</span>
             </Link>

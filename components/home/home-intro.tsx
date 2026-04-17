@@ -18,12 +18,13 @@ export function HomeIntro() {
       />
 
       {introComplete && (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center fade-in-up">
           <Link
-            href="/about"
-            className="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-md transition-colors border border-primary/30"
+            href="/about/"
+            className="inline-flex items-center gap-2 glass-panel hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(0,255,140,0.3)] hover:text-neon hover:border-neon/50 text-white px-6 py-3 rounded-full transition-all duration-300 group font-sans text-sm tracking-wide"
           >
-            Learn more about me <ArrowRight size={16} />
+            <span className="group-hover:drop-shadow-[0_0_8px_rgba(0,255,140,0.8)]">Learn more about me</span> 
+            <ArrowRight size={16} className="group-hover:text-neon group-hover:translate-x-1 transition-all" />
           </Link>
         </div>
       )}

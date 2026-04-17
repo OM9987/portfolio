@@ -72,15 +72,17 @@ export function AboutContent({ experiences, skills }: AboutContentProps) {
       {bioComplete && (
         <>
           <section>
-            <h2 className="text-2xl font-bold mb-6">Experience Timeline</h2>
+            <h2 className="text-2xl font-bold mb-6 font-sans">Experience Timeline</h2>
             <div className="space-y-6">
               {experiences.map((exp) => (
                 <div key={exp.id} className="terminal-window">
-                  <div className="terminal-header">
-                    <div className="terminal-button terminal-button-red"></div>
-                    <div className="terminal-button terminal-button-yellow"></div>
-                    <div className="terminal-button terminal-button-green"></div>
-                    <div className="terminal-title">{exp.company}.sh</div>
+                  <div className="terminal-header relative justify-center pt-2">
+                    <div className="absolute left-4 flex gap-2 items-center">
+                      <div className="terminal-button terminal-button-red"></div>
+                      <div className="terminal-button terminal-button-yellow"></div>
+                      <div className="terminal-button terminal-button-green"></div>
+                    </div>
+                    <div className="terminal-title m-0 text-center font-sans tracking-wide">{exp.company}.sh</div>
                   </div>
                   <div className="terminal-content">
                     <p className="mb-1">
@@ -102,13 +104,15 @@ export function AboutContent({ experiences, skills }: AboutContentProps) {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-6">System Specs</h2>
+            <h2 className="text-2xl font-bold mb-6 font-sans">System Specs</h2>
             <div className="terminal-window">
-              <div className="terminal-header">
-                <div className="terminal-button terminal-button-red"></div>
-                <div className="terminal-button terminal-button-yellow"></div>
-                <div className="terminal-button terminal-button-green"></div>
-                <div className="terminal-title">skills.sh</div>
+              <div className="terminal-header relative justify-center pt-2">
+                <div className="absolute left-4 flex gap-2 items-center">
+                  <div className="terminal-button terminal-button-red"></div>
+                  <div className="terminal-button terminal-button-yellow"></div>
+                  <div className="terminal-button terminal-button-green"></div>
+                </div>
+                <div className="terminal-title m-0 text-center font-sans tracking-wide">skills.sh</div>
               </div>
               <div className="terminal-content">
                 <p className="mb-4">
@@ -134,14 +138,16 @@ export function AboutContent({ experiences, skills }: AboutContentProps) {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-6">Contact</h2>
+            <h2 className="text-2xl font-bold mb-6 font-sans">Contact</h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="terminal-window">
-                <div className="terminal-header">
-                  <div className="terminal-button terminal-button-red"></div>
-                  <div className="terminal-button terminal-button-yellow"></div>
-                  <div className="terminal-button terminal-button-green"></div>
-                  <div className="terminal-title">contact_form.sh</div>
+                <div className="terminal-header relative justify-center pt-2">
+                  <div className="absolute left-4 flex gap-2 items-center">
+                    <div className="terminal-button terminal-button-red"></div>
+                    <div className="terminal-button terminal-button-yellow"></div>
+                    <div className="terminal-button terminal-button-green"></div>
+                  </div>
+                  <div className="terminal-title m-0 text-center font-sans tracking-wide">contact_form.sh</div>
                 </div>
                 <div className="terminal-content">
                   <form className="space-y-4" onSubmit={handleSubmit}>
@@ -158,11 +164,13 @@ export function AboutContent({ experiences, skills }: AboutContentProps) {
               </div>
 
               <div className="terminal-window">
-                <div className="terminal-header">
-                  <div className="terminal-button terminal-button-red"></div>
-                  <div className="terminal-button terminal-button-yellow"></div>
-                  <div className="terminal-button terminal-button-green"></div>
-                  <div className="terminal-title">network_connections.sh</div>
+                <div className="terminal-header relative justify-center pt-2">
+                  <div className="absolute left-4 flex gap-2 items-center">
+                    <div className="terminal-button terminal-button-red"></div>
+                    <div className="terminal-button terminal-button-yellow"></div>
+                    <div className="terminal-button terminal-button-green"></div>
+                  </div>
+                  <div className="terminal-title m-0 text-center font-sans tracking-wide">network_connections.sh</div>
                 </div>
                 <div className="terminal-content space-y-3">
                   <Link href="https://github.com/OM9987" className="flex items-center gap-2 hover:text-primary transition-colors" target="_blank">
