@@ -2,15 +2,29 @@ export default function ProjectsLoading() {
   return (
     <div className="space-y-8">
       <div className="terminal-window">
-        <div className="terminal-header">
-          <div className="terminal-button terminal-button-red"></div>
-          <div className="terminal-button terminal-button-yellow"></div>
-          <div className="terminal-button terminal-button-green"></div>
-          <div className="terminal-title">projects.sh</div>
+        <div className="terminal-header relative justify-center pt-2">
+          <div className="absolute left-4 flex gap-2 items-center">
+            <div className="terminal-button terminal-button-red"></div>
+            <div className="terminal-button terminal-button-yellow"></div>
+            <div className="terminal-button terminal-button-green"></div>
+          </div>
+          <div className="terminal-title m-0 text-center font-sans tracking-wide">projects.sh</div>
         </div>
-        <div className="terminal-content">
-          <div className="mb-4 h-4 w-full max-w-md animate-pulse rounded bg-muted/40" aria-hidden />
-          <p className="text-sm text-muted-foreground">Loading projects directory...</p>
+        <div className="terminal-content flex flex-col items-center justify-center py-8 gap-4">
+          <div className="relative h-8 w-8 animate-spin">
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div
+                key={i}
+                className="absolute left-1/2 top-0 h-2.5 w-1 -translate-x-1/2 rounded-full bg-neon"
+                style={{
+                  transform: `rotate(${i * 45}deg) translateY(0)`,
+                  transformOrigin: "center 16px",
+                  opacity: 1 - i * 0.1,
+                }}
+              />
+            ))}
+          </div>
+          <p className="text-sm text-neon font-sans animate-pulse tracking-widest uppercase">Fetching Projects Info...</p>
         </div>
       </div>
 
