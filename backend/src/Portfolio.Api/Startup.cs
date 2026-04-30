@@ -1,3 +1,4 @@
+using Amazon.DynamoDBv2;
 using Portfolio.Api.Interfaces;
 using Portfolio.Api.Services;
 
@@ -17,6 +18,8 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<IAmazonDynamoDB>(_ => new AmazonDynamoDBClient());
+        services.AddMemoryCache();
         services.AddScoped<IExperienceService, ExperienceService>();
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IBlogPostService, BlogPostService>();

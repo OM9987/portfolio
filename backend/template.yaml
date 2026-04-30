@@ -7,12 +7,19 @@ Parameters:
     Type: String
     Default: http://localhost:3000
     Description: Semicolon-separated list of allowed CORS origins for the backend API.
+  DynamoDbTableName:
+    Type: String
+    Default: portfolio-data
+    Description: DynamoDB table that stores portfolio entities.
 
 Resources:
   PortfolioHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       CorsConfiguration: false
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 50
+        ThrottlingRateLimit: 20
 
   AspNetCoreFunction:
     Type: AWS::Serverless::Function
@@ -24,9 +31,12 @@ Resources:
       Timeout: 10
       Policies:
         - AWSLambdaBasicExecutionRole
+        - DynamoDBReadPolicy:
+            TableName: !Ref DynamoDbTableName
       Environment:
         Variables:
           AllowedOrigins: !Ref AllowedOrigins
+          DynamoDbTableName: !Ref DynamoDbTableName
       Events:
         ProxyResource:
           Type: HttpApi
@@ -40,12 +50,6 @@ Resources:
             ApiId: !Ref PortfolioHttpApi
             Path: /
             Method: ANY
-
-  AspNetCoreFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AspNetCoreFunction}
-      RetentionInDays: 7
 
 Outputs:
   ApiURL:
