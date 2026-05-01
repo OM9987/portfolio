@@ -7,6 +7,11 @@
       "Type": "String",
       "Default": "http://localhost:3000",
       "Description": "Semicolon-separated list of allowed CORS origins for the backend API."
+    },
+    "DynamoDbTableName": {
+      "Type": "String",
+      "Default": "portfolio-data",
+      "Description": "DynamoDB table that stores portfolio entities."
     }
   },
   "Resources": {
@@ -37,12 +42,22 @@
         "MemorySize": 256,
         "Timeout": 10,
         "Policies": [
-          "AWSLambdaBasicExecutionRole"
+          "AWSLambdaBasicExecutionRole",
+          {
+            "DynamoDBReadPolicy": {
+              "TableName": {
+                "Ref": "DynamoDbTableName"
+              }
+            }
+          }
         ],
         "Environment": {
           "Variables": {
             "AllowedOrigins": {
               "Ref": "AllowedOrigins"
+            },
+            "DynamoDbTableName": {
+              "Ref": "DynamoDbTableName"
             }
           }
         },

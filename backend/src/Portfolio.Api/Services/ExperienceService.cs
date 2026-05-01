@@ -1,32 +1,67 @@
-using Portfolio.Api.Models;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
+using Microsoft.Extensions.Caching.Memory;
 using Portfolio.Api.Interfaces;
+using Portfolio.Api.Models;
 
 namespace Portfolio.Api.Services;
 
 public sealed class ExperienceService : IExperienceService
 {
-    private static readonly IReadOnlyList<Experience> Experiences =
-    [
-        new Experience
-        {
-            Id = "sportz-interactive",
-            Title = "Associate Developer (.NET)",
-            Company = "Sportz Interactive Pvt. Ltd",
-            Period = "07/2024 - Present",
-            Description = "Grew from a Junior Middleware Developer to owning backend architecture for Gaming Application. Built event-driven pipelines using AWS Lambda and SQS for scalable, real-time leaderboard processing. Optimized system performance with Redis caching, async workflows, and RDS Proxy, ensuring stability under high load. Developed and maintained ASP.NET Core APIs, real-time scoring via EventBridge, and improved observability with New Relic across AWS infrastructure."
-        },
-        new Experience
-        {
-            Id = "sayhey-kmr-and-friends",
-            Title = "Data Science Intern | Core AI Team Member",
-            Company = "SayHey - KMR & Friends Pvt. Ltd",
-            Period = "08/2022 - 12/2022",
-            Description = "Led a Government of India-awarded startup, driving projects in Transformers, Generative AI, and interactive Chatbots (RNN, LSTM, Bert). Developed personalized recommendation systems for a Mental Health app, enhancing user experience."
-        }
-    ];
+    private const string CacheKey = "portfolio:experience";
+    private const string ExperienceEntityPk = "ENTITY#experience";
+    private const string ItemSkPrefix = "ITEM#";
+
+    private readonly IAmazonDynamoDB _dynamoDb;
+    private readonly IMemoryCache _memoryCache;
+    private readonly string _tableName;
+
+    public ExperienceService(
+        IAmazonDynamoDB dynamoDb,
+        IMemoryCache memoryCache,
+        IConfiguration configuration)
+    {
+        _dynamoDb = dynamoDb;
+        _memoryCache = memoryCache;
+        _tableName = configuration["DynamoDbTableName"]
+            ?? throw new InvalidOperationException("DynamoDbTableName is not configured.");
+    }
 
     public IReadOnlyList<Experience> GetExperiences()
     {
-        return Experiences;
+        return _memoryCache.GetOrCreate(CacheKey, _ => LoadExperiencesFromDynamoDb())!;
+    }
+
+    private IReadOnlyList<Experience> LoadExperiencesFromDynamoDb()
+    {
+        var request = new QueryRequest
+        {
+            TableName = _tableName,
+            KeyConditionExpression = "PK = :pk AND begins_with(SK, :skPrefix)",
+            ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+            {
+                [":pk"] = new AttributeValue { S = ExperienceEntityPk },
+                [":skPrefix"] = new AttributeValue { S = ItemSkPrefix },
+            },
+            ScanIndexForward = true,
+        };
+
+        var response = _dynamoDb.QueryAsync(request).GetAwaiter().GetResult();
+
+        return response.Items.Select(item => new Experience
+        {
+            Id = GetString(item, "Id"),
+            Title = GetString(item, "Title"),
+            Company = GetString(item, "Company"),
+            Period = GetString(item, "Period"),
+            Description = GetString(item, "Description"),
+        }).ToArray();
+    }
+
+    private static string GetString(IReadOnlyDictionary<string, AttributeValue> item, string name)
+    {
+        return item.TryGetValue(name, out var value) && !string.IsNullOrWhiteSpace(value.S)
+            ? value.S
+            : throw new InvalidOperationException($"Missing required DynamoDB attribute '{name}'.");
     }
 }
